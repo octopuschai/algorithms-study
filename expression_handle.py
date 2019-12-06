@@ -18,6 +18,8 @@ https://facert.gitbooks.io/python-data-structure-cn/
 # operator_symbol = ['+', '-', '*', '/', '(', ')']
 operator_symbol = '+-*/()'
 
+numbers = '1234567890'
+
 
 def infix_to_postfix(expression: str) -> str:
     """ 中缀表达式转换成后缀表达式 """
@@ -50,13 +52,52 @@ def infix_to_postfix(expression: str) -> str:
     return ''.join(output)
 
 
+def str_to_int(string) -> int:
+    return sum([
+        int(string[n]) * 10**(len(string) - n - 1) for n in range(len(string))
+    ])
+
+
+def do_math(op: str, num1: int, num2: int) -> int:
+    if op == '+':
+        res = num1 + num2
+    elif op == '-':
+        res = num1 - num2
+    elif op == '*':
+        res = num1 * num2
+    else:
+        res = num1 / num2
+    return res
+
+
+def postfix_to_value(expression: str) -> int:
+    """ 后缀表达式求值 """
+    stack = []
+    for char in expression:
+        if char in numbers:
+            stack.append(int(char))
+        elif char in operator_symbol[:-2]:
+            num2 = stack.pop()
+            num1 = stack.pop()
+            stack.append(do_math(char, num1, num2))
+        else:
+            raise ValueError('Invalid Postfix expression!')
+    return stack.pop()
+
+
 if __name__ == "__main__":
     infix_exps = [
         '(A+B)*C',
         'A*B+C*D',
         '(A+B)*C-(D-E)*(F+G)',
+        '((A+B)*C-D)/(E-F*(G+H))',
     ]
 
     for infix_exp in infix_exps:
         postfix_exp = infix_to_postfix(infix_exp)
         print(f'Infix: {infix_exp} ==> Postfix: {postfix_exp}')
+
+    infix_exp = '(7+8)/(3+2)'
+    postfix_exp = infix_to_postfix(infix_exp)
+    value = postfix_to_value(postfix_exp)
+    print(f'Infix: {infix_exp} ==> Postfix: {postfix_exp} , value = {value}')
