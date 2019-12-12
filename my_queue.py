@@ -12,11 +12,9 @@ class MyQueue:
         self.tail = None
 
     def __len__(self, ):
-        if self.head is None:
-            return 0
-        count = 1
-        head, tail = self.head, self.tail
-        while head != tail:
+        count = 0
+        head = self.head
+        while head is not None:
             head = head._next
             count += 1
         return count
@@ -56,11 +54,9 @@ class MyDeque:
         self.tail = None
 
     def __len__(self, ):
-        if self.head is None:
-            return 0
-        count = 1
-        head, tail = self.head, self.tail
-        while head != tail:
+        count = 0
+        head = self.head
+        while head is not None:
             head = head._next
             count += 1
         return count
@@ -150,3 +146,35 @@ class MyDeque:
             new_node._prev = p
             n._prev = new_node
             new_node._next = n
+
+    def remove(self, value):
+        head = self.head
+        if len(self) == 0:
+            raise IndexError('Error: Deque is empty!')
+        while head is not None:
+            if head._value == value:
+                p = head._prev
+                n = head._next
+                if p is None:
+                    self.head = n
+                else:
+                    p._next = n
+                if n is None:
+                    self.tail = p
+                else:
+                    n._prev = p
+                break
+            head = head._next
+        else:
+            raise ValueError(f"Error: Deque has't this element {value!r}!")
+
+    def sort(self, reverse=False):
+        elements = []
+        head = self.head
+        while head is not None:
+            elements.append(head._value)
+            head = head._next
+        elements.sort(reverse=reverse)
+        self.clear()
+        for element in elements:
+            self.add(element)
