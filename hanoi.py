@@ -42,9 +42,86 @@ def hanoi(nums, start_pole, mid_pole, end_pole):
     return times
 
 
+hanoi_loop_steps = []  # 记录整个移动步骤
+
+
+def hanoi_loop(nums):
+    """ 非递归解决汉诺塔问题 """
+    from collections import deque
+    # 初始化a,b,c柱 每个柱子都LIFO，实际是栈结构，用list模拟
+    a = [i for i in range(nums, 0, -1)]
+    b, c = [], []
+
+    result = a[:]  # 最终结果条件，和C柱状态作比较使用
+
+    # 柱子顺序列表，构成一个环，使用循环队列，用deque模拟
+    if nums % 2:
+        # 当奇数时，柱子初始顺序
+        pole_order = deque([(a, 'A'), (c, 'C'), (b, 'B')], maxlen=3)
+    else:
+        # 当偶数时，柱子初始顺序
+        pole_order = deque([(a, 'A'), (b, 'B'), (c, 'C')], maxlen=3)
+
+    times = 0
+    while c != result:
+        # 柱子顺序作为循环队列使用，取当前柱号，并前进到下一柱
+        curr_pole, curr_pole_name = pole_order.popleft()
+        pole_order.append((curr_pole, curr_pole_name))
+
+        # 下一柱
+        next_pole, next_pole_name = pole_order[0]
+
+        # 从当前柱取1号盘放入下一柱
+        dish_num = curr_pole.pop()
+        next_pole.append(dish_num)
+
+        # 记录步骤
+        times += 1
+        step = f'(No.{dish_num}) dish, {curr_pole_name} -> {next_pole_name}'
+        hanoi_loop_steps.append(step)
+
+        # 取剩余两个柱子柱号one,two
+        one, one_name = pole_order[1]
+        two, two_name = pole_order[2]
+        if not bool(one) and not bool(two):
+            # 剩余两个柱子为空，说明已完成移动
+            break
+        elif not bool(one):
+            # one柱子为空，取two柱子顶端盘子放入one柱子
+            step = f'(No.{two[-1]}) dish, {two_name} -> {one_name}'
+            hanoi_loop_steps.append(step)
+            one.append(two.pop())
+            times += 1
+        elif not bool(two):
+            # two柱子为空，取one柱子顶端盘子放入two柱子
+            step = f'(No.{one[-1]}) dish, {one_name} -> {two_name}'
+            hanoi_loop_steps.append(step)
+            two.append(one.pop())
+            times += 1
+        elif one[-1] > two[-1]:
+            # one柱子顶端盘号大于two柱子顶端盘号，取two柱子顶端盘子放入one柱子
+            step = f'(No.{two[-1]}) dish, {two_name} -> {one_name}'
+            hanoi_loop_steps.append(step)
+            one.append(two.pop())
+            times += 1
+        else:
+            # two柱子顶端盘号大于one柱子顶端盘号，取one柱子顶端盘子放入two柱子
+            step = f'(No.{one[-1]}) dish, {one_name} -> {two_name}'
+            hanoi_loop_steps.append(step)
+            two.append(one.pop())
+            times += 1
+    return times
+
+
 if __name__ == "__main__":
-    nums = 4
+    nums = 10
     times = hanoi(nums, 'A', 'B', 'C')
     print(f'Hanoi, {nums} dishes, times={times}')
     for index, step in enumerate(steps, 1):
+        print(f'step {index:<2d} : {step}')
+
+    print('=' * 80)
+    times = hanoi_loop(nums)
+    print(f'Hanoi_loop, {nums} dishes, times={times}')
+    for index, step in enumerate(hanoi_loop_steps, 1):
         print(f'step {index:<2d} : {step}')
