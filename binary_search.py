@@ -4,7 +4,7 @@ def binary_search(seq, item) -> bool:
         raise ValueError('Original Seq is empty!')
     seq = sorted(seq)
     while low < high:
-        idx = int((low + high) / 2)
+        idx = (low + high) // 2
         if seq[idx] < item:
             low = idx + 1
         elif seq[idx] > item:

@@ -17,11 +17,11 @@ def quick_sort2(seq) -> list:
     long = len(seq)
     if long <= 1:
         return seq
-    pivot = seq.pop(int(long / 2))
+    pivot = seq.pop(long // 2)
     l_sub, g_sub = [], []
     for item in seq:
         if item > pivot:
             g_sub.append(item)
         else:
             l_sub.append(item)
-    return quick_sort(l_sub) + [pivot] + quick_sort(g_sub)
+    return quick_sort2(l_sub) + [pivot] + quick_sort2(g_sub)
