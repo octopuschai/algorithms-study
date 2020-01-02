@@ -30,3 +30,15 @@ class BinaryHeap(object):
             for value in tmp_list:
                 self.insert(value)
         return res
+
+    def min_child(self, par_idx):
+        left = par_idx * 2
+        right = left + 1
+        if left > self.size:
+            return None
+        elif left == self.size:
+            return left
+        else:
+            if self.heap_list[left] < self.heap_list[right]:
+                return left
+            return right
