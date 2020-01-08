@@ -15,6 +15,7 @@ class BinarySearchTree(object):
         self.size = 0
 
     def insert(self, value):
+        """ insert a node with value """
         new_node = TreeNode(value)
         if self.size == 0:
             self.root = new_node
@@ -37,6 +38,7 @@ class BinarySearchTree(object):
         self.size += 1
 
     def get(self, value):
+        """ return node with value or None """
         n = self.root
         while n:
             if value == n.data:
@@ -47,6 +49,7 @@ class BinarySearchTree(object):
                 n = n.right
 
     def delete(self, value):
+        """ delete a node with value """
         node = self.get(value)
         if not node:
             raise ValueError(f'Error, {value} is not in tree.')
@@ -59,18 +62,26 @@ class BinarySearchTree(object):
             if node.is_left_child():
                 node.right.parent = node.parent
                 node.parent.right = node.right
-            if node.is_right_child():
+            elif node.is_right_child():
                 node.right.parent = node.parent
                 node.parent.left = node.right
+            else:  # node.parent is None, node is root node
+                node.right.parent = None
+                self.root = node.right
         elif node.right is None:  # node has only left child
             if node.is_left_child():
                 node.left.parent = node.parent
                 node.parent.left = node.left
-            if node.is_right_child():
+            elif node.is_right_child():
                 node.left.parent = node.parent
                 node.parent.right = node.left
+            else:  # node.parent is None, node is root node
+                node.left.parent = None
+                self.root = node.left
         else:  # node have two children
             pass
+
+        self.size -= 1
 
     def is_left_child(self, ):
         """ self is parent's left child """
