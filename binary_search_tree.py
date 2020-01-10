@@ -8,6 +8,29 @@ class TreeNode(object):
         self.left = None
         self.right = None
 
+    def is_leaf(self, ):
+        """ self is a leaf node """
+        return not (self.left or self.right)
+
+    def is_left_child(self, ):
+        """ self is parent's left child """
+        return self.parent and self.parent.left == self
+
+    def is_right_child(self, ):
+        """ self is parent's right child """
+        return self.parent and self.parent.right == self
+
+    def __iter__(self, ):
+        """ make tree node iterable, mid-traverse tree """
+        if self:
+            if self.left:
+                for node in self.left:
+                    yield node
+            yield self.data
+            if self.right:
+                for node in self.right:
+                    yield node
+
 
 class BinarySearchTree(object):
     def __init__(self, ):
@@ -23,7 +46,7 @@ class BinarySearchTree(object):
             n = self.root
             while n:
                 p = n
-                if value < n.data:
+                if value <= n.data:
                     flag = 0
                     n = n.left
                 else:
@@ -53,7 +76,7 @@ class BinarySearchTree(object):
         node = self.get(value)
         if not node:
             raise ValueError(f'Error, {value} is not in tree.')
-        if not (node.left or node.right):  # node is a leaf node
+        if node.is_leaf():  # node is a leaf node
             if node.is_left_child():
                 node.parent.left = None
             if node.is_right_child():
@@ -79,17 +102,32 @@ class BinarySearchTree(object):
                 node.left.parent = None
                 self.root = node.left
         else:  # node have two children
-            pass
-
+            replace_node = self.find_next(node)
+            node.data = replace_node.data
+            # replace_node.delete()
+            if replace_node.is_leaf():  # replace_node is a leaf node
+                if replace_node.is_left_child():
+                    replace_node.parent.left = None
+                if replace_node.is_right_child():
+                    replace_node.parent.right = None
+            else:  # replace_node has only left child
+                if replace_node.is_left_child():
+                    replace_node.left.parent = replace_node.parent
+                    replace_node.parent.left = replace_node.left
+                elif replace_node.is_right_child():
+                    replace_node.left.parent = replace_node.parent
+                    replace_node.parent.right = replace_node.left
+                else:  # replace_node.parent is None, node is root node
+                    replace_node.left.parent = None
+                    self.root = replace_node.left
         self.size -= 1
 
-    def is_left_child(self, ):
-        """ self is parent's left child """
-        return self.parent and self.parent.left == self
-
-    def is_right_child(self, ):
-        """ self is parent's right child """
-        return self.parent and self.parent.right == self
+    def find_next(self, curr_node):
+        """ find next node which has second bigger value than curr_node"""
+        n = curr_node.left
+        while n.right:
+            n = n.right
+        return n
 
     def build(self, seq):
         """ insert node from a seq """
@@ -102,6 +140,9 @@ class BinarySearchTree(object):
             self.traverse(node.left, seq)
             seq.append(node.data)
             self.traverse(node.right, seq)
+
+    def __len__(self, ):
+        return self.size
 
     def __repr__(self, ):
         seq = []
