@@ -56,11 +56,11 @@ class AVL(object):
                     flag = 1
             if flag:
                 p.right = node
-                p.balance_factor -= 1
             else:
                 p.left = node
-                p.balance_factor += 1
             node.parent = p
+            self.update_balance_factor(p)
+
         self.size += 1
 
     def height(self, node):
@@ -73,8 +73,39 @@ class AVL(object):
     def update_balance_factor(self, node):
         """ update node balance factor recursively """
         node.balance_factor = self.height(node.left) - self.height(node.right)
+        if abs(node.balance_factor) > 1:
+            self.rebalance(node)
         if node.parent is not None:
             self.update_balance_factor(node.parent)
+
+    def rebalance(self, node):
+        if node.has_left_child():
+            if node.left.balance_factor == 1:
+                self.rotate_right(node)
+            if node.left.balance_factor == -1:
+                pass
+        if node.has_right_child():
+            if node.right.balance_factor == -1:
+                self.rotate_left(node)
+            if node.right.balance_factor == 1:
+                pass
+
+    def rotate_left(self, node):
+        node.right.parent = node.parent
+        if node.has_left_child():
+            pass
+
+    def rotate_right(self, node):
+        node.left.parent = node.parent
+        if node.has_right_child():
+            node.parent = node.left
+            tmp_node = node.left.right
+            node.left.right = node
+            node.left = tmp_node
+        else:
+            node.parent = node.left
+            node.left.right = node
+            node.left = None
 
     def delete(self, value):
         pass
