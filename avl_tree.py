@@ -79,21 +79,28 @@ class AVL(object):
             self.update_balance_factor(node.parent)
 
     def rebalance(self, node):
-        if node.has_left_child():
+        if node.balance_factor > 0:
             if node.left.balance_factor == 1:
                 self.rotate_left(node)
             if node.left.balance_factor == -1:
                 self.rotate_right(node.left)
                 self.rotate_left(node)
-        if node.has_right_child():
+        else:
             if node.right.balance_factor == -1:
                 self.rotate_right(node)
             if node.right.balance_factor == 1:
-                pass
+                self.rotate_left(node.right)
+                self.rotate_left(node)
 
     def rotate_left(self, node):
         node.left.parent = node.parent
-        node.parent.left = node.left
+        if self.root == node:  # node is root node
+            self.root = node.left
+        else:
+            if node.is_left_child():
+                node.parent.left = node.left
+            else:
+                node.parent.right = node.left
         if node.has_right_child():
             node.parent = node.left
             tmp_node = node.left.right
@@ -106,7 +113,13 @@ class AVL(object):
 
     def rotate_right(self, node):
         node.right.parent = node.parent
-        node.parent.right = node.right
+        if self.root == node:
+            self.root = node.right
+        else:
+            if node.is_right_child():
+                node.parent.right = node.right
+            else:
+                node.parent.left = node.right
         if node.has_left_child():
             node.parent = node.right
             tmp_node = node.right.left
