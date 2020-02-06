@@ -5,6 +5,7 @@ class TreeNode(object):
     def __init__(self, data=None):
         self.data = data  # node value
         self.balance_factor = 0  # node balance factor
+        # value 0 means left sub-tree-height equal right sub-tree-height
         self.parent = None  # node parent pointer
         self.left = None  # node left child pointer
         self.right = None  # node right child pointer
@@ -79,16 +80,17 @@ class AVL(object):
             self.update_balance_factor(node.parent)
 
     def rebalance(self, node):
+        """ adjust node balance factor """
         if node.balance_factor > 0:
-            if node.left.balance_factor == 1:
+            if node.left.balance_factor > 0:
                 self.rotate_left(node)
-            if node.left.balance_factor == -1:
+            else:
                 self.rotate_right(node.left)
                 self.rotate_left(node)
         else:
-            if node.right.balance_factor == -1:
+            if node.right.balance_factor < 0:
                 self.rotate_right(node)
-            if node.right.balance_factor == 1:
+            else:
                 self.rotate_left(node.right)
                 self.rotate_left(node)
 
@@ -110,6 +112,8 @@ class AVL(object):
             node.parent = node.left
             node.left.right = node
             node.left = None
+        node.balance_factor -= 1
+        node.right.balance_factor = max(0, node.right.balance_factor - 2)
 
     def rotate_right(self, node):
         node.right.parent = node.parent
@@ -129,6 +133,8 @@ class AVL(object):
             node.parent = node.right
             node.right.left = node
             node.right = None
+        node.balance_factor += 1
+        node.right.balance_factor = min(0, node.right.balance_factor + 2)
 
     def delete(self, value):
         pass
