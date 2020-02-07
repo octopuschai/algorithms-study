@@ -67,7 +67,7 @@ class AVL(object):
     def height(self, node):
         """ return height of node sub-tree """
         h = 0
-        if node.has_any_children():
+        if node is not None:
             h = 1 + max(self.height(node.left), self.height(node.right))
         return h
 
@@ -95,6 +95,9 @@ class AVL(object):
                 self.rotate_left(node)
 
     def rotate_left(self, node):
+        new_node = node.left
+        new_height = self.height(new_node)
+        new_r_height = self.height(new_node.right)
         node.left.parent = node.parent
         if self.root == node:  # node is root node
             self.root = node.left
@@ -112,10 +115,18 @@ class AVL(object):
             node.parent = node.left
             node.left.right = node
             node.left = None
-        node.balance_factor -= 1
-        node.right.balance_factor = max(0, node.right.balance_factor - 2)
+        # new_node.balance_factor -= 1
+        # node.balance_factor = max(0, node.balance_factor - 2)
+        # node.balance_factor = node.balance_factor + self.height(
+        #     new_node.right) - self.height(new_node)
+        node.balance_factor = node.balance_factor + new_r_height - new_height
+        new_node.balance_factor = new_node.balance_factor - 1 + min(
+            0, node.balance_factor)
 
     def rotate_right(self, node):
+        new_node = node.right
+        new_height = self.height(new_node)
+        new_l_height = self.height(new_node.left)
         node.right.parent = node.parent
         if self.root == node:
             self.root = node.right
@@ -133,8 +144,27 @@ class AVL(object):
             node.parent = node.right
             node.right.left = node
             node.right = None
-        node.balance_factor += 1
-        node.right.balance_factor = min(0, node.right.balance_factor + 2)
+        # new_node.balance_factor += 1
+        # node.balance_factor = min(0, node.balance_factor + 2)
+        # node.balance_factor = node.balance_factor + self.height(
+        #     new_node) - self.height(new_node.left)
+        node.balance_factor = node.balance_factor + new_height - new_l_height
+        new_node.balance_factor = new_node.balance_factor + 1 + max(
+            0, node.balance_factor)
 
     def delete(self, value):
         pass
+
+    def traverse(self, node, seq):
+        if node is not None:
+            self.traverse(node.left, seq)
+            seq.append((node.data, node.balance_factor))
+            self.traverse(node.right, seq)
+
+    def __len__(self, ):
+        return self.size
+
+    def __repr__(self, ):
+        seq = []
+        self.traverse(self.root, seq)
+        return ','.join(map(str, seq))
