@@ -27,8 +27,22 @@ def build_graph(filename):
 
 def bfs(graph, start):
     """ breadth first search """
-    q=MyQueue()
-    q.add(start)
-    while que:
-        vert=q.pop()
-        
+    q = MyQueue()
+    visited_id = set()  # avoid visit repeated
+    v = graph.get_vertex(start)
+    if v:
+        visited_id.add(v.id)  # add start vertex
+        # add v.nbr in queue
+        for i in v.get_connections():
+            q.add(i)
+            visited_id.add(i.id)
+    else:
+        raise ValueError('Error! start vertex {start} is not in Graph.')
+    while q:  # bfs traverse
+        current_vert = q.pop()
+        print(current_vert.id)  # print vertex id by bfs
+
+        for i in current_vert.get_connections():
+            if i.id not in visited_id:
+                q.add(i)
+                visited_id.add(i.id)
